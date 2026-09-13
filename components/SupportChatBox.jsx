@@ -41,16 +41,16 @@ const QUICK_PROMPTS = [
   'Luggage allowance details',
 ];
 
-function BotAvatar({ className = 'w-11 h-11', size = 24 }) {
+function BotAvatar({ className = 'w-11 h-11', size, svgClassName = '' }) {
   return (
     <div className={`relative ${className} rounded-full bg-[#0066FF] flex items-center justify-center shadow-md flex-shrink-0`}>
       <svg
-        width={size}
-        height={size}
+        width={size || undefined}
+        height={size || undefined}
         viewBox="0 0 40 40"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="text-white"
+        className={`text-white ${svgClassName || (!size ? 'w-3/5 h-3/5' : '')}`}
       >
         {/* Antenna */}
         <circle cx="20" cy="7" r="2.2" fill="white" />
@@ -135,6 +135,31 @@ export default function SupportChatBox() {
       setTimeout(() => inputRef.current?.focus(), 150);
     }
   }, [isOpen, messages]);
+
+  // Stop background scrolling when chat bot is open on mobile screens
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const syncScrollLock = () => {
+      const isMobile = window.innerWidth < 768;
+      if (isOpen && isMobile) {
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+      }
+    };
+
+    syncScrollLock();
+    window.addEventListener('resize', syncScrollLock);
+
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      window.removeEventListener('resize', syncScrollLock);
+    };
+  }, [isOpen]);
 
   // Handle connecting user directly with an official representative
   const handleConnectOfficial = (customText) => {
@@ -335,38 +360,48 @@ export default function SupportChatBox() {
   };
 
   return (
-    <aside aria-label="Hans Travels Support Chat" className="fixed bottom-5 right-5 z-30 font-sans pointer-events-auto">
-      {/* Floating Bottom-Right Launcher: Small Circle showing ONLY the Robot */}
-      {!isOpen && (
-        <button
-          type="button"
-          id="Contact Support"
-          onClick={handleOpenChat}
-          className="Contact Support contact-support group relative w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-white p-1 shadow-[0_10px_28px_rgba(0,102,255,0.22),0_4px_12px_rgba(0,0,0,0.1)] hover:shadow-[0_14px_36px_rgba(0,102,255,0.35),0_6px_16px_rgba(0,0,0,0.15)] border border-slate-100/90 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-200 select-none flex items-center justify-center"
-          aria-label="Support Bot - Contact Support"
-          title="Support Bot (Online)"
-        >
-          <BotAvatar className="w-full h-full" size={26} />
-
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 bg-brand-red text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs border-2 border-white">
-              {unreadCount}
-            </span>
-          )}
-        </button>
-      )}
-
-      {/* Floating Chat Box Window */}
+    <>
+      {/* Mobile Backdrop to prevent background touches/scrolling when chat is open */}
       {isOpen && (
         <div
-          role="dialog"
-          aria-modal="false"
-          aria-label="Bus Support Chat Window"
-          className="w-[92vw] sm:w-[380px] h-[540px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fade-in transform-gpu [transform:translateZ(0)]"
-          style={{
-            boxShadow: '0 20px 50px -12px rgba(0, 102, 255, 0.2), 0 8px 24px -4px rgba(0, 0, 0, 0.12)',
-          }}
-        >
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
+          className="fixed inset-0 bg-black/45 backdrop-blur-[2px] z-30 sm:hidden transition-opacity duration-300"
+        />
+      )}
+
+      <aside aria-label="Hans Travels Support Chat" className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-40 font-sans pointer-events-auto">
+        {/* Floating Bottom-Right Launcher: Larger on mobile for easy thumb tapping */}
+        {!isOpen && (
+          <button
+            type="button"
+            id="Contact Support"
+            onClick={handleOpenChat}
+            className="Contact Support contact-support group relative w-[60px] h-[60px] sm:w-[52px] sm:h-[52px] rounded-full bg-white p-1.5 sm:p-1 shadow-[0_10px_28px_rgba(0,102,255,0.28),0_4px_12px_rgba(0,0,0,0.12)] hover:shadow-[0_14px_36px_rgba(0,102,255,0.38),0_6px_16px_rgba(0,0,0,0.18)] border-2 border-white/90 transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-200 select-none flex items-center justify-center"
+            aria-label="Support Bot - Contact Support"
+            title="Support Bot (Online)"
+          >
+            <BotAvatar className="w-full h-full" svgClassName="w-8 h-8 sm:w-6 sm:h-6" />
+
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-brand-red text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs border-2 border-white">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+        )}
+
+        {/* Floating Chat Box Window */}
+        {isOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Bus Support Chat Window"
+            className="w-[calc(100vw-2rem)] sm:w-[380px] h-[540px] max-h-[82vh] sm:max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fade-in transform-gpu [transform:translateZ(0)]"
+            style={{
+              boxShadow: '0 20px 50px -12px rgba(0, 102, 255, 0.2), 0 8px 24px -4px rgba(0, 0, 0, 0.12)',
+            }}
+          >
           {/* Header */}
           <header className="bg-white text-slate-900 px-5 py-3.5 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
             <div className="flex items-center gap-3">
@@ -433,7 +468,7 @@ export default function SupportChatBox() {
           </div>
 
           {/* Scrollable Message List */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50/50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex-1 p-4 overflow-y-auto overscroll-contain space-y-3.5 bg-slate-50/50 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {messages.map((msg) => {
               const isAi = msg.role === 'model';
               return (
@@ -620,6 +655,7 @@ export default function SupportChatBox() {
           </footer>
         </div>
       )}
-    </aside>
+      </aside>
+    </>
   );
 }
