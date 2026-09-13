@@ -9,7 +9,7 @@ const FLEET_BUSES = [
     id: 1,
     name: 'Volvo 9600',
     type: 'Multi-Axle Sleeper',
-    image: '/assets/bus-hero.jpg',
+    image: '/assets/bus-hero.webp',
     tags: ['Sleeper', 'AC', 'USB', 'GPS'],
   },
   {
@@ -64,7 +64,7 @@ export default function FleetShowcase() {
             fill
             sizes="(max-width: 1024px) 100vw, 1024px"
             className="object-cover object-center transition-all duration-500 ease-out"
-            priority
+            loading="lazy"
           />
           {/* Subtle gradient for depth */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />

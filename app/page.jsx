@@ -15,11 +15,21 @@ import BookingSupportCTA from '../components/BookingSupportCTA';
 import AppDownloadStrip from '../components/AppDownloadStrip';
 import Footer from '../components/Footer';
 
-import SearchResultsView from '../components/SearchResultsView';
-import SearchResultsModal from '../components/SearchResultsModal';
-import ManageBookingModal from '../components/ManageBookingModal';
-import TrackBusModal from '../components/TrackBusModal';
-import AuthModal from '../components/AuthModal';
+import dynamic from 'next/dynamic';
+
+const SearchResultsView = dynamic(() => import('../components/SearchResultsView'), {
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+  ssr: false,
+});
+
+const SearchResultsModal = dynamic(() => import('../components/SearchResultsModal'), { ssr: false });
+const ManageBookingModal = dynamic(() => import('../components/ManageBookingModal'), { ssr: false });
+const TrackBusModal = dynamic(() => import('../components/TrackBusModal'), { ssr: false });
+const AuthModal = dynamic(() => import('../components/AuthModal'), { ssr: false });
 
 export default function HomePage() {
   const [searchResultsOpen, setSearchResultsOpen] = useState(false);
@@ -78,11 +88,11 @@ export default function HomePage() {
           {/* Mobile & Small Screens: Optimized Passenger Sleeper Image */}
           <div className="block md:hidden absolute inset-0 w-full h-full">
             <Image
-              src="/assets/hero-mobile.png"
+              src="/assets/hero-mobile.webp"
               alt="Hans Travels Luxury Sleeper Coach"
               fill
               priority
-              sizes="100vw"
+              sizes="(max-width: 768px) 100vw, 1px"
               className="object-cover object-[68%_center] scale-105 opacity-75 filter brightness-90 contrast-105"
             />
           </div>
@@ -173,27 +183,35 @@ export default function HomePage() {
       {/* 10. Clean Compact Footer (Quick links, Support, Policies, Careers, Copyright) */}
       <Footer onOpenManageBooking={() => setManageBookingOpen(true)} />
 
-      {/* Interactive Modals */}
-      <SearchResultsModal
-        isOpen={searchResultsOpen}
-        onClose={() => setSearchResultsOpen(false)}
-        searchParams={searchParams}
-      />
+      {/* Interactive Modals (Loaded on demand) */}
+      {searchResultsOpen && (
+        <SearchResultsModal
+          isOpen={searchResultsOpen}
+          onClose={() => setSearchResultsOpen(false)}
+          searchParams={searchParams}
+        />
+      )}
 
-      <ManageBookingModal
-        isOpen={manageBookingOpen}
-        onClose={() => setManageBookingOpen(false)}
-      />
+      {manageBookingOpen && (
+        <ManageBookingModal
+          isOpen={manageBookingOpen}
+          onClose={() => setManageBookingOpen(false)}
+        />
+      )}
 
-      <TrackBusModal
-        isOpen={trackBusOpen}
-        onClose={() => setTrackBusOpen(false)}
-      />
+      {trackBusOpen && (
+        <TrackBusModal
+          isOpen={trackBusOpen}
+          onClose={() => setTrackBusOpen(false)}
+        />
+      )}
 
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
+      {authModalOpen && (
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

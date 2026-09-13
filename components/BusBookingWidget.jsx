@@ -202,6 +202,9 @@ export default function BusBookingWidget({ onSearch }) {
                   </span>
                   <input
                     ref={fromInputRef}
+                    id="from-city-input"
+                    name="fromCity"
+                    aria-label="Departure City"
                     type="text"
                     value={fromCity}
                     onChange={(e) => {
@@ -461,6 +464,9 @@ export default function BusBookingWidget({ onSearch }) {
                   </span>
                   <input
                     ref={toInputRef}
+                    id="to-city-input"
+                    name="toCity"
+                    aria-label="Destination City"
                     type="text"
                     value={toCity}
                     onChange={(e) => {
@@ -726,6 +732,7 @@ export default function BusBookingWidget({ onSearch }) {
         <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 z-20 w-full px-4 sm:w-auto sm:px-0 flex justify-center">
           <button
             type="submit"
+            aria-label="Search buses"
             className="w-full sm:w-auto max-w-[280px] sm:max-w-none bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-sm sm:text-base md:text-lg px-6 sm:px-12 py-3 sm:py-3.5 rounded-full shadow-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
           >
             <Search className="w-4 h-4 sm:w-5 sm:h-5" />

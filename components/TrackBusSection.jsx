@@ -49,6 +49,9 @@ export default function TrackBusSection({ onOpenTrackBusModal }) {
               <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
+                id="track-bus-input"
+                name="busIdentifier"
+                aria-label="Booking ID or Mobile Number"
                 required
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}

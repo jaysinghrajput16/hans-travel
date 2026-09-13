@@ -1,6 +1,8 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
-import SupportChatBox from '../components/SupportChatBox';
+import dynamic from 'next/dynamic';
+
+const SupportChatBox = dynamic(() => import('../components/SupportChatBox'), { ssr: false });
 
 const inter = Inter({
   subsets: ['latin'],

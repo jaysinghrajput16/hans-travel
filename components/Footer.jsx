@@ -34,7 +34,7 @@ export default function Footer({ onOpenManageBooking }) {
                 width={782}
                 height={296}
                 className="w-28 sm:w-36 md:w-44 h-auto object-contain"
-                priority
+                loading="lazy"
               />
             </Link>
             <p className="text-[11px] sm:text-xs text-gray-400 leading-relaxed max-w-sm">
