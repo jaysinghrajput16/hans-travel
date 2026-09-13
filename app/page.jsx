@@ -104,6 +104,7 @@ export default function HomePage() {
             muted
             playsInline
             preload="metadata"
+            poster="/assets/hero-mobile.webp"
             className="hidden md:block w-full h-full object-cover scale-105 opacity-70 filter saturate-[0.95] brightness-95 contrast-[0.98] transition-opacity duration-700 transform-gpu [transform:translateZ(0)]"
           >
             <source src="/assets/hero-video.mp4" type="video/mp4" />
