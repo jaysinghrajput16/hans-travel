@@ -73,15 +73,28 @@ export default function HomePage() {
 
       {/* 2. Full-Screen Hero Section with Background Video + Hero Copy + CTA Buttons + Booking Box */}
       <section id="hero" className="relative w-full min-h-screen flex flex-col justify-between pt-20 sm:pt-28 pb-10 sm:pb-16 bg-gray-950 scroll-mt-16 overflow-visible">
-        {/* Full-Screen Background Video with 70% Opacity & GPU Hardware Layering */}
+        {/* Hero Background Layer: Image on Mobile & Small Screens, Video on Desktop */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black transform-gpu [transform:translateZ(0)] [will-change:transform] [backface-visibility:hidden]">
+          {/* Mobile & Small Screens: Optimized Passenger Sleeper Image */}
+          <div className="block md:hidden absolute inset-0 w-full h-full">
+            <Image
+              src="/assets/hero-mobile.png"
+              alt="Hans Travels Luxury Sleeper Coach"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-[68%_center] scale-105 opacity-75 filter brightness-90 contrast-105"
+            />
+          </div>
+
+          {/* Desktop Screens (md and above): Background Video */}
           <video
             autoPlay
             loop
             muted
             playsInline
             preload="metadata"
-            className="w-full h-full object-cover scale-105 opacity-70 filter saturate-[0.95] brightness-95 contrast-[0.98] transition-opacity duration-700 transform-gpu [transform:translateZ(0)]"
+            className="hidden md:block w-full h-full object-cover scale-105 opacity-70 filter saturate-[0.95] brightness-95 contrast-[0.98] transition-opacity duration-700 transform-gpu [transform:translateZ(0)]"
           >
             <source src="/assets/hero-video.mp4" type="video/mp4" />
             <source src="/mark/videomp4.mp4" type="video/mp4" />
