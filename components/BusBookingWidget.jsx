@@ -169,7 +169,7 @@ export default function BusBookingWidget({ onSearch }) {
 
   return (
     /* Outer white container wrapper: relative positioning with pb-12 md:pb-14 for half-inside half-outside button */
-    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto bg-white rounded-3xl shadow-2xl px-4 py-3 md:px-5 md:py-3.5 relative pb-12 md:pb-14 z-30">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto bg-white rounded-3xl shadow-2xl px-3 py-3 sm:px-4 sm:py-3.5 md:px-5 md:py-3.5 relative pb-12 sm:pb-14 z-30">
       <form
         onSubmit={handleSearchSubmit}
         onKeyDown={(e) => {
@@ -180,14 +180,14 @@ export default function BusBookingWidget({ onSearch }) {
         }}
       >
         {/* Precise 3-column horizontal grid with streamlined slim height */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 items-center divide-y lg:divide-y-0 lg:divide-x divide-gray-100 bg-white rounded-2xl border border-gray-200/80 px-3 py-1.5 sm:px-4 sm:py-2 relative">
+        <div className="grid grid-cols-1 lg:grid-cols-3 items-center divide-y lg:divide-y-0 lg:divide-x divide-gray-100 bg-white rounded-2xl border border-gray-200/80 px-2.5 py-1 sm:px-4 sm:py-2 relative">
           
           {/* Column 1: Combine Origin and Destination inputs into a unified sub-flex container inside first 2 grid spans */}
-          <div className="lg:col-span-2 flex flex-col sm:flex-row items-center justify-between relative px-1 sm:px-2">
+          <div className="lg:col-span-2 flex flex-col sm:flex-row items-center justify-between relative px-0.5 sm:px-2">
             
             {/* FROM Field */}
             <div
-              className="flex-1 w-full relative py-1 px-2.5 sm:py-1.5 sm:pl-3 sm:pr-12 pb-3 sm:pb-1.5 hover:bg-slate-50/70 transition-colors rounded-xl cursor-text"
+              className="flex-1 w-full relative py-1 px-2.5 sm:py-1.5 sm:pl-3 sm:pr-12 pb-2 sm:pb-1.5 hover:bg-slate-50/70 transition-colors rounded-xl cursor-text"
               ref={fromContainerRef}
               onClick={() => {
                 setIsFromOpen(true);
@@ -252,7 +252,7 @@ export default function BusBookingWidget({ onSearch }) {
               {/* Autocomplete Dropdown Popover */}
               {isFromOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-full sm:w-[380px] max-w-[92vw] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 p-4 max-h-80 overflow-y-auto overscroll-contain animate-in fade-in slide-in-from-top-1 duration-150 text-left"
+                  className="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 w-[calc(100vw-2.5rem)] max-w-sm sm:w-[380px] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 p-3 sm:p-4 max-h-72 sm:max-h-80 overflow-y-auto overscroll-contain animate-in fade-in slide-in-from-top-1 duration-150 text-left"
                   role="listbox"
                 >
                   {!fromQuery ? (
@@ -426,12 +426,12 @@ export default function BusBookingWidget({ onSearch }) {
               )}
             </div>
 
-            {/* Circular swap button (⇄) right in the absolute center between the two fields */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+            {/* Circular swap button (⇄) */}
+            <div className="relative my-[-10px] sm:my-0 sm:absolute sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-20 flex justify-center">
               <button
                 type="button"
                 onClick={handleSwap}
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#3e3e3e] hover:bg-black text-white rounded-full shadow-md flex items-center justify-center transition-all duration-300 active:scale-95 cursor-pointer border-2 border-white"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-[#3e3e3e] hover:bg-black text-white rounded-full shadow-md flex items-center justify-center transition-all duration-300 active:scale-95 cursor-pointer border-2 border-white"
                 title="Swap Departure and Destination"
                 aria-label="Swap Departure and Destination"
               >
@@ -439,14 +439,14 @@ export default function BusBookingWidget({ onSearch }) {
                   style={{ transform: `rotate(${swapRotation}deg)` }}
                   className="transition-transform duration-500 ease-in-out"
                 >
-                  <ArrowRightLeft className="w-4 h-4 text-white" />
+                  <ArrowRightLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white rotate-90 sm:rotate-0" />
                 </div>
               </button>
             </div>
 
             {/* TO Field */}
             <div
-              className="flex-1 w-full relative py-1 px-2.5 sm:py-1.5 sm:pl-12 sm:pr-3 pt-3 sm:pt-1.5 hover:bg-slate-50/70 transition-colors rounded-xl cursor-text"
+              className="flex-1 w-full relative py-1 px-2.5 sm:py-1.5 sm:pl-12 sm:pr-3 pt-2 sm:pt-1.5 hover:bg-slate-50/70 transition-colors rounded-xl cursor-text"
               ref={toContainerRef}
               onClick={() => {
                 setIsToOpen(true);
@@ -511,7 +511,7 @@ export default function BusBookingWidget({ onSearch }) {
               {/* Autocomplete Dropdown Popover */}
               {isToOpen && (
                 <div
-                  className="absolute top-full left-0 sm:left-auto sm:right-0 mt-3 w-full sm:w-[380px] max-w-[92vw] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 p-4 max-h-80 overflow-y-auto overscroll-contain animate-in fade-in slide-in-from-top-1 duration-150 text-left"
+                  className="absolute top-full left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 mt-2 w-[calc(100vw-2.5rem)] max-w-sm sm:w-[380px] bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 p-3 sm:p-4 max-h-72 sm:max-h-80 overflow-y-auto overscroll-contain animate-in fade-in slide-in-from-top-1 duration-150 text-left"
                   role="listbox"
                 >
                   {!toQuery ? (
@@ -707,7 +707,7 @@ export default function BusBookingWidget({ onSearch }) {
 
             {/* Floating Horizontal DatePicker */}
             {activePicker === 'departure' && (
-              <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-3 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 mt-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150 w-[calc(100vw-2.5rem)] max-w-[320px]">
                 <DateRangePicker
                   departureDate={departureDate}
                   onSelectDeparture={(date) => {
@@ -723,12 +723,13 @@ export default function BusBookingWidget({ onSearch }) {
         </div>
 
         {/* Center-Overlapping "Search Buses" Button: anchored half-inside and half-outside the bottom edge */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 z-20">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 z-20 w-full px-4 sm:w-auto sm:px-0 flex justify-center">
           <button
             type="submit"
-            className="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-base sm:text-lg px-12 py-3.5 rounded-full shadow-xl flex items-center gap-2 transition-all transform hover:scale-105 cursor-pointer whitespace-nowrap"
+            className="w-full sm:w-auto max-w-[280px] sm:max-w-none bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-sm sm:text-base md:text-lg px-6 sm:px-12 py-3 sm:py-3.5 rounded-full shadow-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
           >
-            <Search className="w-5 h-5" /> Search buses
+            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>Search buses</span>
           </button>
         </div>
 

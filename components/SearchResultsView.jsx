@@ -65,6 +65,18 @@ export default function SearchResultsView({
   const [selectedBus, setSelectedBus] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState(['L4']);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  // Active filter counter for mobile filter badge
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (aiQuery.trim()) count++;
+    count += selectedTimeSlots.length;
+    count += Object.values(busTypeFilters).filter(Boolean).length;
+    count += selectedAmenities.length;
+    if (maxPrice < 2000) count++;
+    return count;
+  }, [aiQuery, selectedTimeSlots, busTypeFilters, selectedAmenities, maxPrice]);
 
   // Swap From & To cities
   const handleSwapCities = () => {
@@ -236,54 +248,251 @@ export default function SearchResultsView({
     };
   }, []);
 
+  // Shared Filter Controls for both Desktop Sidebar and Mobile Drawer
+  const renderFilterContent = () => (
+    <div className="space-y-6">
+      {/* AI Smart Filter / Voice Search Box */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-brand-red animate-pulse" />
+            AI Smart Search
+          </label>
+          <span className="text-[10px] font-semibold text-brand-red bg-red-50 px-1.5 py-0.5 rounded">
+            AI Filter
+          </span>
+        </div>
+        <div className="relative">
+          <input
+            type="text"
+            value={aiQuery}
+            onChange={(e) => setAiQuery(e.target.value)}
+            placeholder='Try "Morning bus under ₹1500"'
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-8 py-2.5 text-xs text-brand-charcoal placeholder-slate-400 focus:outline-none focus:border-brand-red focus:bg-white transition-all shadow-inner"
+          />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+          {aiQuery ? (
+            <button
+              type="button"
+              onClick={() => setAiQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <Mic className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
+          )}
+        </div>
+        {/* Sample AI query chips */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {['Morning bus under ₹1500', 'Primo AC Sleeper', 'Mercedes'].map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => setAiQuery(chip)}
+              className="text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Departure Time Slots */}
+      <div className="space-y-2.5 pt-2 border-t border-slate-100">
+        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+          Departure Time
+        </h4>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: 'morning', label: 'Morning', sub: '6 AM - 12 PM', icon: Sun, count: filterCounts.morning },
+            { id: 'afternoon', label: 'Afternoon', sub: '12 PM - 6 PM', icon: Sunset, count: filterCounts.afternoon },
+            { id: 'night', label: 'Night', sub: 'After 6 PM', icon: Moon, count: filterCounts.night }
+          ].map(({ id, label, sub, icon: Icon, count }) => {
+            const isSelected = selectedTimeSlots.includes(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => toggleTimeSlot(id)}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                  isSelected
+                    ? 'border-brand-red bg-red-50/70 shadow-xs'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <Icon className={`w-4 h-4 ${isSelected ? 'text-brand-red' : 'text-slate-500'}`} />
+                  <span className="text-[10px] font-bold text-slate-400">({count})</span>
+                </div>
+                <div className="mt-1">
+                  <span className={`text-xs font-bold block ${isSelected ? 'text-brand-red' : 'text-slate-800'}`}>
+                    {label}
+                  </span>
+                  <span className="text-[9px] text-slate-400 block">{sub}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bus Types / Amenities Filters with Live Counts */}
+      <div className="space-y-3 pt-2 border-t border-slate-100">
+        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+          Bus Types
+        </h4>
+        <div className="space-y-2 text-xs">
+          {[
+            { key: 'ac', label: 'AC Coaches', count: filterCounts.ac },
+            { key: 'sleeper', label: 'Sleeper (2+1)', count: filterCounts.sleeper },
+            { key: 'singleSeats', label: 'Single Berths Available', count: filterCounts.singleSeats },
+            { key: 'seater', label: 'Executive Seater', count: filterCounts.seater },
+            { key: 'primo', label: 'Primo Coaches (Top Rated)', count: filterCounts.primo }
+          ].map(({ key, label, count }) => {
+            const active = busTypeFilters[key];
+            return (
+              <label
+                key={key}
+                onClick={() => toggleBusType(key)}
+                className="flex items-center justify-between py-1 px-1.5 rounded-lg hover:bg-slate-50 cursor-pointer select-none transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                      active
+                        ? 'bg-brand-red border-brand-red text-white'
+                        : 'border-slate-300 bg-white'
+                    }`}
+                  >
+                    {active && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                  <span className={`text-xs font-medium ${active ? 'text-brand-charcoal font-bold' : 'text-slate-700'}`}>
+                    {label}
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-slate-400">({count})</span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Amenities Checkboxes */}
+      <div className="space-y-2.5 pt-2 border-t border-slate-100">
+        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+          Amenities
+        </h4>
+        <div className="space-y-1.5 text-xs">
+          {['Live GPS Tracking', 'Water Bottle', 'Blanket & Pillow', 'Fast USB Charging'].map((amenity) => {
+            const isChecked = selectedAmenities.includes(amenity);
+            return (
+              <label
+                key={amenity}
+                onClick={() => toggleAmenity(amenity)}
+                className="flex items-center gap-2.5 py-1 px-1.5 rounded-lg hover:bg-slate-50 cursor-pointer select-none"
+              >
+                <div
+                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                    isChecked
+                      ? 'bg-brand-red border-brand-red text-white'
+                      : 'border-slate-300 bg-white'
+                  }`}
+                >
+                  {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                </div>
+                <span className="text-xs text-slate-700">{amenity}</span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Price Range Slider */}
+      <div className="space-y-2 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-black text-slate-800 uppercase tracking-wider">Max Price</span>
+          <span className="font-black text-brand-red text-sm">₹{maxPrice}</span>
+        </div>
+        <input
+          type="range"
+          min="700"
+          max="2000"
+          step="50"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(parseInt(e.target.value, 10))}
+          className="w-full accent-brand-red cursor-pointer"
+        />
+        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
+          <span>₹700</span>
+          <span>₹1,350</span>
+          <span>₹2,000</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#F7F9FC] flex flex-col font-sans text-slate-800">
       {/* ========================================================================= */}
       {/* 1. STICKY TOP RESULTS HEADER & COMPACT SEARCH BAR                         */}
       {/* ========================================================================= */}
       <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
             {/* Left: Brand & Back to Home */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onBackHome}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer shadow-xs"
-                title="Back to Home"
-              >
-                <ArrowLeft className="w-4 h-4 text-brand-red" />
-                <span className="hidden sm:inline">Home</span>
-              </button>
+            <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <button
+                  type="button"
+                  onClick={onBackHome}
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer shadow-xs flex-shrink-0"
+                  title="Back to Home"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-red" />
+                  <span className="hidden xs:inline sm:inline">Home</span>
+                </button>
 
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center text-white shadow-xs">
-                  <Bus className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-base sm:text-lg font-black text-brand-charcoal leading-none">
-                      {fromCity}
-                    </h1>
-                    <span className="text-brand-red font-bold text-sm">&rarr;</span>
-                    <h1 className="text-base sm:text-lg font-black text-brand-charcoal leading-none">
-                      {toCity}
-                    </h1>
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-brand-red flex items-center justify-center text-white shadow-xs flex-shrink-0">
+                    <Bus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
-                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                    {journeyDate} &bull;{' '}
-                    <span className="text-emerald-700 font-bold">
-                      {selectedBus ? '1 Coach Selected' : `${filteredBuses.length} Buses Available`}
-                    </span>
-                  </p>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <h1 className="text-sm sm:text-base md:text-lg font-black text-brand-charcoal leading-none truncate">
+                        {fromCity}
+                      </h1>
+                      <span className="text-brand-red font-bold text-xs sm:text-sm flex-shrink-0">&rarr;</span>
+                      <h1 className="text-sm sm:text-base md:text-lg font-black text-brand-charcoal leading-none truncate">
+                        {toCity}
+                      </h1>
+                    </div>
+                    <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium mt-0.5 truncate">
+                      {journeyDate} &bull;{' '}
+                      <span className="text-emerald-700 font-bold">
+                        {selectedBus ? '1 Coach Selected' : `${filteredBuses.length} Buses`}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* On mobile, show modify button inline if not modifying */}
+              {!isModifying && (
+                <button
+                  type="button"
+                  onClick={() => setIsModifying(true)}
+                  className="sm:hidden px-2.5 py-1 bg-brand-red hover:bg-brand-red-hover text-white text-[11px] font-bold rounded-lg transition-all shadow-xs cursor-pointer flex-shrink-0"
+                >
+                  Modify
+                </button>
+              )}
             </div>
 
             {/* Right: Compact Search Bar & Modify Toggle */}
-            <div className="flex items-center gap-2">
+            <div className="w-full sm:w-auto">
               {!isModifying ? (
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-700">
+                <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-700">
                   <span className="font-semibold text-slate-900">{fromCity}</span>
                   <span className="text-slate-400">&rarr;</span>
                   <span className="font-semibold text-slate-900">{toCity}</span>
@@ -300,61 +509,63 @@ export default function SearchResultsView({
               ) : (
                 <form
                   onSubmit={handleApplyModify}
-                  className="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-300 rounded-2xl p-2 animate-fadeIn"
+                  className="flex flex-wrap items-center gap-1.5 sm:gap-2 bg-slate-50 border border-slate-300 rounded-2xl p-2 animate-fadeIn w-full sm:w-auto"
                 >
-                  <div className="flex items-center bg-white rounded-xl border border-slate-200 px-2.5 py-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase mr-1.5">From:</span>
+                  <div className="flex-1 min-w-[90px] flex items-center bg-white rounded-xl border border-slate-200 px-2 py-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase mr-1">From:</span>
                     <input
                       type="text"
                       value={fromCity}
                       onChange={(e) => setFromCity(e.target.value)}
-                      className="text-xs font-bold text-brand-charcoal w-24 sm:w-28 bg-transparent focus:outline-none"
+                      className="text-xs font-bold text-brand-charcoal w-full bg-transparent focus:outline-none"
                     />
                   </div>
 
                   <button
                     type="button"
                     onClick={handleSwapCities}
-                    className="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-brand-red transition-colors cursor-pointer"
+                    className="p-1 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-brand-red transition-colors cursor-pointer flex-shrink-0"
                     title="Swap Cities"
                   >
-                    <ArrowLeftRight className="w-3.5 h-3.5" />
+                    <ArrowLeftRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
 
-                  <div className="flex items-center bg-white rounded-xl border border-slate-200 px-2.5 py-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase mr-1.5">To:</span>
+                  <div className="flex-1 min-w-[90px] flex items-center bg-white rounded-xl border border-slate-200 px-2 py-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase mr-1">To:</span>
                     <input
                       type="text"
                       value={toCity}
                       onChange={(e) => setToCity(e.target.value)}
-                      className="text-xs font-bold text-brand-charcoal w-24 sm:w-28 bg-transparent focus:outline-none"
+                      className="text-xs font-bold text-brand-charcoal w-full bg-transparent focus:outline-none"
                     />
                   </div>
 
-                  <div className="flex items-center bg-white rounded-xl border border-slate-200 px-2.5 py-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase mr-1.5">Date:</span>
+                  <div className="w-full sm:w-auto flex items-center bg-white rounded-xl border border-slate-200 px-2 py-1">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase mr-1">Date:</span>
                     <input
                       type="date"
                       value={journeyDate}
                       onChange={(e) => setJourneyDate(e.target.value)}
-                      className="text-xs font-bold text-brand-charcoal bg-transparent focus:outline-none"
+                      className="text-xs font-bold text-brand-charcoal bg-transparent focus:outline-none w-full sm:w-auto"
                     />
                   </div>
 
-                  <button
-                    type="submit"
-                    className="px-4 py-1.5 bg-brand-red hover:bg-brand-red-hover text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer"
-                  >
-                    Update
-                  </button>
+                  <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                    <button
+                      type="submit"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 bg-brand-red hover:bg-brand-red-hover text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer text-center"
+                    >
+                      Update
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsModifying(false)}
-                    className="p-1.5 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsModifying(false)}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </form>
               )}
             </div>
@@ -417,9 +628,9 @@ export default function SearchResultsView({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* ========================================================================= */}
-          {/* 2. ADVANCED SIDEBAR FILTERS PANEL (LEFT COLUMN)                           */}
+          {/* 2. ADVANCED SIDEBAR FILTERS PANEL (DESKTOP)                               */}
           {/* ========================================================================= */}
-          <aside className="lg:col-span-3 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 space-y-6 sticky top-24">
+          <aside className="hidden lg:block lg:col-span-3 bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 space-y-6 sticky top-24">
             {/* Sidebar Title & Clear All */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
@@ -438,190 +649,52 @@ export default function SearchResultsView({
               </button>
             </div>
 
-            {/* AI Smart Filter / Voice Search Box */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-brand-red animate-pulse" />
-                  AI Smart Search
-                </label>
-                <span className="text-[10px] font-semibold text-brand-red bg-red-50 px-1.5 py-0.5 rounded">
-                  AI Filter
-                </span>
-              </div>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={aiQuery}
-                  onChange={(e) => setAiQuery(e.target.value)}
-                  placeholder='Try "Morning bus under ₹1500"'
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-8 py-2.5 text-xs text-brand-charcoal placeholder-slate-400 focus:outline-none focus:border-brand-red focus:bg-white transition-all shadow-inner"
-                />
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                {aiQuery ? (
-                  <button
-                    type="button"
-                    onClick={() => setAiQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <Mic className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
-                )}
-              </div>
-              {/* Sample AI query chips */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {['Morning bus under ₹1500', 'Primo AC Sleeper', 'Mercedes'].map((chip) => (
-                  <button
-                    key={chip}
-                    type="button"
-                    onClick={() => setAiQuery(chip)}
-                    className="text-[10px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
-                  >
-                    {chip}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Departure Time Slots */}
-            <div className="space-y-2.5 pt-2 border-t border-slate-100">
-              <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
-                Departure Time
-              </h4>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { id: 'morning', label: 'Morning', sub: '6 AM - 12 PM', icon: Sun, count: filterCounts.morning },
-                  { id: 'afternoon', label: 'Afternoon', sub: '12 PM - 6 PM', icon: Sunset, count: filterCounts.afternoon },
-                  { id: 'night', label: 'Night', sub: 'After 6 PM', icon: Moon, count: filterCounts.night }
-                ].map(({ id, label, sub, icon: Icon, count }) => {
-                  const isSelected = selectedTimeSlots.includes(id);
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => toggleTimeSlot(id)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                        isSelected
-                          ? 'border-brand-red bg-red-50/70 shadow-xs'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <Icon className={`w-4 h-4 ${isSelected ? 'text-brand-red' : 'text-slate-500'}`} />
-                        <span className="text-[10px] font-bold text-slate-400">({count})</span>
-                      </div>
-                      <div className="mt-1">
-                        <span className={`text-xs font-bold block ${isSelected ? 'text-brand-red' : 'text-slate-800'}`}>
-                          {label}
-                        </span>
-                        <span className="text-[9px] text-slate-400 block">{sub}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Bus Types / Amenities Filters with Live Counts */}
-            <div className="space-y-3 pt-2 border-t border-slate-100">
-              <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
-                Bus Types
-              </h4>
-              <div className="space-y-2 text-xs">
-                {[
-                  { key: 'ac', label: 'AC Coaches', count: filterCounts.ac },
-                  { key: 'sleeper', label: 'Sleeper (2+1)', count: filterCounts.sleeper },
-                  { key: 'singleSeats', label: 'Single Berths Available', count: filterCounts.singleSeats },
-                  { key: 'seater', label: 'Executive Seater', count: filterCounts.seater },
-                  { key: 'primo', label: 'Primo Coaches (Top Rated)', count: filterCounts.primo }
-                ].map(({ key, label, count }) => {
-                  const active = busTypeFilters[key];
-                  return (
-                    <label
-                      key={key}
-                      onClick={() => toggleBusType(key)}
-                      className="flex items-center justify-between py-1 px-1.5 rounded-lg hover:bg-slate-50 cursor-pointer select-none transition-colors"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                            active
-                              ? 'bg-brand-red border-brand-red text-white'
-                              : 'border-slate-300 bg-white'
-                          }`}
-                        >
-                          {active && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <span className={`text-xs font-medium ${active ? 'text-brand-charcoal font-bold' : 'text-slate-700'}`}>
-                          {label}
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-bold text-slate-400">({count})</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Amenities Checkboxes */}
-            <div className="space-y-2.5 pt-2 border-t border-slate-100">
-              <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
-                Amenities
-              </h4>
-              <div className="space-y-1.5 text-xs">
-                {['Live GPS Tracking', 'Water Bottle', 'Blanket & Pillow', 'Fast USB Charging'].map((amenity) => {
-                  const isChecked = selectedAmenities.includes(amenity);
-                  return (
-                    <label
-                      key={amenity}
-                      onClick={() => toggleAmenity(amenity)}
-                      className="flex items-center gap-2.5 py-1 px-1.5 rounded-lg hover:bg-slate-50 cursor-pointer select-none"
-                    >
-                      <div
-                        className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                          isChecked
-                            ? 'bg-brand-red border-brand-red text-white'
-                            : 'border-slate-300 bg-white'
-                        }`}
-                      >
-                        {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                      <span className="text-xs text-slate-700">{amenity}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Price Range Slider */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-black text-slate-800 uppercase tracking-wider">Max Price</span>
-                <span className="font-black text-brand-red text-sm">₹{maxPrice}</span>
-              </div>
-              <input
-                type="range"
-                min="700"
-                max="2000"
-                step="50"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(parseInt(e.target.value, 10))}
-                className="w-full accent-brand-red cursor-pointer"
-              />
-              <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-                <span>₹700</span>
-                <span>₹1,350</span>
-                <span>₹2,000</span>
-              </div>
-            </div>
+            {renderFilterContent()}
           </aside>
 
           {/* ========================================================================= */}
           {/* RIGHT COLUMN: PROMO CAROUSEL, SORT TOOLBAR & BUS CARD FEED                */}
           {/* ========================================================================= */}
           <main className="lg:col-span-9 space-y-6">
+
+            {/* Mobile Filter & Coaches Count Header Bar (< lg screens only) */}
+            {!selectedBus && (
+              <div className="lg:hidden flex items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-xs">
+                <div className="text-xs text-slate-700 min-w-0">
+                  <div className="font-black text-brand-charcoal text-sm">
+                    {filteredBuses.length} Coaches Available
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium truncate">
+                    {fromCity} &rarr; {toCity}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {activeFilterCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllFilters}
+                      className="text-xs font-bold text-brand-red px-2.5 py-1.5 hover:bg-red-50 rounded-lg cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileFilterOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-red hover:bg-brand-red-hover active:bg-brand-red-active text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                    <span>Filters</span>
+                    {activeFilterCount > 0 && (
+                      <span className="w-4 h-4 rounded-full bg-white text-brand-red text-[10px] font-black flex items-center justify-center">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
             
             {/* ========================================================================= */}
             {/* 3. PROMOTIONAL TOP BANNER CAROUSEL (HORIZONTAL CARDS)                     */}
@@ -751,8 +824,8 @@ export default function SearchResultsView({
                   <strong className="text-brand-charcoal">{fromCity} &rarr; {toCity}</strong>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-slate-400 font-bold uppercase text-[10px] mr-1">Sort by:</span>
+                <div className="flex items-center gap-1.5 text-xs overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto scrollbar-none">
+                  <span className="text-slate-400 font-bold uppercase text-[10px] mr-1 shrink-0">Sort by:</span>
                   {[
                     { id: 'ratings', label: 'Ratings' },
                     { id: 'departure', label: 'Departure' },
@@ -763,7 +836,7 @@ export default function SearchResultsView({
                       key={tab.id}
                       type="button"
                       onClick={() => setSortBy(tab.id)}
-                      className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs ${
+                      className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer text-xs shrink-0 ${
                         sortBy === tab.id
                           ? 'bg-brand-red text-white shadow-xs'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -840,20 +913,20 @@ export default function SearchResultsView({
                     </div>
 
                     {/* Timings */}
-                    <div className="flex items-center gap-6 text-center">
+                    <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6 text-center w-full sm:w-auto py-2 sm:py-0 border-y sm:border-y-0 border-slate-100">
                       <div>
-                        <span className="text-2xl font-black text-brand-charcoal block">{selectedBus.departureTime}</span>
+                        <span className="text-xl sm:text-2xl font-black text-brand-charcoal block">{selectedBus.departureTime}</span>
                         <span className="text-xs text-slate-500 font-semibold">{fromCity}</span>
                       </div>
                       <div className="flex flex-col items-center">
                         <span className="text-[10px] text-slate-400 font-bold">{selectedBus.duration}</span>
-                        <div className="w-24 h-0.5 bg-slate-200 my-1.5 relative">
+                        <div className="w-16 sm:w-24 h-0.5 bg-slate-200 my-1.5 relative">
                           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-600" />
                         </div>
                         <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Direct</span>
                       </div>
                       <div>
-                        <span className="text-2xl font-black text-brand-charcoal block">{selectedBus.arrivalTime}</span>
+                        <span className="text-xl sm:text-2xl font-black text-brand-charcoal block">{selectedBus.arrivalTime}</span>
                         <span className="text-xs text-slate-500 font-semibold">{toCity}</span>
                       </div>
                     </div>
@@ -1118,7 +1191,7 @@ export default function SearchResultsView({
                         </div>
 
                         {/* Route Timings */}
-                        <div className="flex items-center gap-6 sm:gap-8 text-center shrink-0">
+                        <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-8 text-center w-full sm:w-auto py-2 sm:py-0 border-y sm:border-y-0 border-slate-100">
                           <div>
                             <span className="text-xl sm:text-2xl font-black text-brand-charcoal block">
                               {bus.departureTime}
@@ -1127,7 +1200,7 @@ export default function SearchResultsView({
                           </div>
                           <div className="flex flex-col items-center">
                             <span className="text-[10px] text-slate-400 font-bold">{bus.duration}</span>
-                            <div className="w-20 sm:w-24 h-0.5 bg-slate-200 my-1.5 relative">
+                            <div className="w-16 sm:w-24 h-0.5 bg-slate-200 my-1.5 relative">
                               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-400" />
                             </div>
                             <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">
@@ -1169,6 +1242,61 @@ export default function SearchResultsView({
           </main>
         </div>
       </div>
+
+      {/* Mobile Filters Bottom Sheet Drawer */}
+      {isMobileFilterOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end lg:hidden animate-fadeIn">
+          <div
+            className="fixed inset-0 -z-10"
+            onClick={() => setIsMobileFilterOpen(false)}
+          />
+          <div className="bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl border-t border-slate-200 animate-slideUp">
+            {/* Drawer Header */}
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-brand-red" />
+                <h3 className="text-sm font-black text-brand-charcoal uppercase tracking-wider">
+                  Filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
+                </h3>
+              </div>
+              <div className="flex items-center gap-3">
+                {activeFilterCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearAllFilters}
+                    className="text-xs font-bold text-brand-red hover:underline cursor-pointer"
+                  >
+                    Reset All
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Drawer Scrollable Content */}
+            <div className="p-5 overflow-y-auto space-y-6 flex-1">
+              {renderFilterContent()}
+            </div>
+
+            {/* Drawer Fixed CTA Footer */}
+            <div className="p-4 border-t border-slate-100 bg-white flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="w-full py-3.5 bg-brand-red hover:bg-brand-red-hover active:bg-brand-red-active text-white text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer text-center"
+              >
+                Show {filteredBuses.length} Coaches
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

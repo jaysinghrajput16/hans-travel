@@ -95,7 +95,7 @@ export default function TermsAndConditionsPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-shrink-0">
               <button
                 type="button"
                 onClick={handlePrint}

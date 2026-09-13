@@ -53,7 +53,7 @@ export default function ManageBookingModal({ isOpen, onClose, initialTab = 'mana
       <div className="bg-white rounded-3xl shadow-modal w-full max-w-lg overflow-hidden border border-slate-200 transform-gpu [transform:translateZ(0)] [will-change:transform]">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 bg-brand-light-blue/40">
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-100 bg-brand-light-blue/40">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-black text-brand-charcoal">
@@ -108,7 +108,7 @@ export default function ManageBookingModal({ isOpen, onClose, initialTab = 'mana
 
         {/* Tab 2: Manage & Print Ticket Flow */}
         {activeTab === 'manage' && (
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             {!ticketDetails ? (
               <form onSubmit={handleManageBooking} className="space-y-4">
                 <div>

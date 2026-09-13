@@ -112,7 +112,7 @@ export default function DateRangePicker({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="w-[320px] sm:w-[340px] bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden select-none animate-in fade-in zoom-in-95 duration-150 p-4 space-y-3.5 ring-1 ring-black/5"
+      className="w-full max-w-[320px] bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden select-none animate-in fade-in zoom-in-95 duration-150 p-4 space-y-3.5 ring-1 ring-black/5"
     >
 
       {/* 2. Horizontal Month Navigation Bar */}

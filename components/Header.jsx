@@ -295,10 +295,24 @@ export default function Header({ onOpenManageBooking, onOpenTrackBus, onOpenAuth
                 setIsOpen(false);
                 onOpenManageBooking?.();
               }}
-              className="text-xl font-bold transition-colors text-left text-gray-900 hover:text-red-600 cursor-pointer py-1.5"
+              className="text-lg sm:text-xl font-bold transition-colors text-left text-gray-900 hover:text-red-600 cursor-pointer py-1.5"
             >
               Manage Booking
             </button>
+            <Link
+              href="/about-us"
+              onClick={() => setIsOpen(false)}
+              className="text-lg sm:text-xl font-bold transition-colors text-left text-gray-900 hover:text-red-600 cursor-pointer py-1.5"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/careers"
+              onClick={() => setIsOpen(false)}
+              className="text-lg sm:text-xl font-bold transition-colors text-left text-gray-900 hover:text-red-600 cursor-pointer py-1.5"
+            >
+              Careers
+            </Link>
           </nav>
 
           {/* Bottom Actions for Mobile */}

@@ -101,39 +101,39 @@ export default function AboutUsPage() {
           </p>
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 max-w-4xl">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
-              <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Legacy</span>
-              <p className="text-2xl sm:text-3xl font-black text-white mt-1">1980s</p>
-              <span className="text-[11px] text-slate-300">40+ Years of Excellence</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-6 max-w-4xl">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold block">Legacy</span>
+              <p className="text-xl sm:text-3xl font-black text-white mt-1">1980s</p>
+              <span className="text-[10px] sm:text-[11px] text-slate-300">40+ Years of Excellence</span>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
-              <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Active Fleet</span>
-              <p className="text-2xl sm:text-3xl font-black text-white mt-1">150+</p>
-              <span className="text-[11px] text-slate-300">Commercial Coaches</span>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold block">Active Fleet</span>
+              <p className="text-xl sm:text-3xl font-black text-white mt-1">150+</p>
+              <span className="text-[10px] sm:text-[11px] text-slate-300">Commercial Coaches</span>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
-              <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Network</span>
-              <p className="text-2xl sm:text-3xl font-black text-white mt-1">50+</p>
-              <span className="text-[11px] text-slate-300">Daily Highway Routes</span>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold block">Network</span>
+              <p className="text-xl sm:text-3xl font-black text-white mt-1">50+</p>
+              <span className="text-[10px] sm:text-[11px] text-slate-300">Daily Highway Routes</span>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15">
-              <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold block">Coverage</span>
-              <p className="text-2xl sm:text-3xl font-black text-white mt-1">70+</p>
-              <span className="text-[11px] text-slate-300">Cities Across 8 States</span>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15">
+              <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold block">Coverage</span>
+              <p className="text-xl sm:text-3xl font-black text-white mt-1">70+</p>
+              <span className="text-[10px] sm:text-[11px] text-slate-300">Cities Across 8 States</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Narrative Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full space-y-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 flex-1 w-full space-y-8 sm:space-y-12">
 
         {/* Company Background Card */}
-        <section className="bg-white rounded-3xl p-6 sm:p-10 shadow-soft border border-slate-200 space-y-6">
+        <section className="bg-white rounded-3xl p-4 sm:p-8 md:p-10 shadow-soft border border-slate-200 space-y-6">
           <div className="border-b border-slate-100 pb-5">
             <span className="text-xs font-bold text-red-600 uppercase tracking-widest block mb-1">
               Corporate Profile & History
@@ -183,7 +183,7 @@ export default function AboutUsPage() {
         </section>
 
         {/* Industry Awards & National Recognitions */}
-        <section className="bg-white rounded-3xl p-6 sm:p-10 shadow-soft border border-slate-200 space-y-8">
+        <section className="bg-white rounded-3xl p-4 sm:p-8 md:p-10 shadow-soft border border-slate-200 space-y-8">
           <div className="border-b border-slate-100 pb-5 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-red-600 uppercase tracking-widest block mb-1">

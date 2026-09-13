@@ -47,7 +47,7 @@ export default function CareerApplicationForm() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-card p-6 sm:p-10 relative">
+    <div className="w-full max-w-3xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-card p-4 sm:p-8 md:p-10 relative">
       <div className="border-b border-slate-100 pb-6 mb-8">
         <span className="text-xs uppercase tracking-widest font-black text-blue-700 bg-brand-light-blue px-3 py-1 rounded-full border border-blue-100">
           Career Application Portal

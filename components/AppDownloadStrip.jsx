@@ -26,13 +26,13 @@ export default function AppDownloadStrip() {
           </div>
 
           {/* Right Side (The Store Buttons) */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto shrink-0">
             {/* Apple App Store Link */}
             <a
               href="https://apps.apple.com/in/app/hans-travels/id1479011244"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3.5 bg-black hover:bg-black/90 text-white px-5 py-3 rounded-2xl border border-white/25 hover:border-white/50 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 min-w-[175px]"
+              className="group flex items-center justify-center sm:justify-start gap-3.5 bg-black hover:bg-black/90 text-white px-5 py-3 rounded-2xl border border-white/25 hover:border-white/50 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto min-w-0 sm:min-w-[175px]"
               aria-label="Download Hans Travels on Apple App Store"
             >
               {/* High-Definition Apple SVG Icon */}
@@ -58,7 +58,7 @@ export default function AppDownloadStrip() {
               href="https://play.google.com/store/apps/details?id=com.hans.travel&hl=en_IN"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3.5 bg-black hover:bg-black/90 text-white px-5 py-3 rounded-2xl border border-white/25 hover:border-white/50 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 min-w-[175px]"
+              className="group flex items-center justify-center sm:justify-start gap-3.5 bg-black hover:bg-black/90 text-white px-5 py-3 rounded-2xl border border-white/25 hover:border-white/50 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 w-full sm:w-auto min-w-0 sm:min-w-[175px]"
               aria-label="Get Hans Travels on Google Play"
             >
               {/* High-Definition Vibrant Google Play SVG Icon */}

@@ -72,7 +72,7 @@ export default function HomePage() {
       />
 
       {/* 2. Full-Screen Hero Section with Background Video + Hero Copy + CTA Buttons + Booking Box */}
-      <section id="hero" className="relative w-full min-h-screen flex flex-col justify-between pt-24 sm:pt-28 pb-12 sm:pb-16 bg-gray-950 scroll-mt-16 overflow-visible">
+      <section id="hero" className="relative w-full min-h-screen flex flex-col justify-between pt-20 sm:pt-28 pb-10 sm:pb-16 bg-gray-950 scroll-mt-16 overflow-visible">
         {/* Full-Screen Background Video with 70% Opacity & GPU Hardware Layering */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black transform-gpu [transform:translateZ(0)] [will-change:transform] [backface-visibility:hidden]">
           <video
@@ -93,32 +93,32 @@ export default function HomePage() {
         </div>
 
         {/* Hero Copy & CTA Buttons (High z-index: z-30) */}
-        <div className="relative z-30 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4 sm:space-y-5 animate-slide-up my-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold uppercase tracking-wider shadow-lg">
+        <div className="relative z-30 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3.5 sm:space-y-5 animate-slide-up my-auto pt-2 sm:pt-0">
+          <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] sm:text-xs font-semibold uppercase tracking-wider shadow-lg">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
             Central India&apos;s Premier Luxury Transit
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.12] drop-shadow-xl">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15] drop-shadow-xl">
             Travel Better. Arrive On Time.
           </h1>
 
-          <p className="text-base sm:text-lg lg:text-xl text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed drop-shadow-md">
+          <p className="text-sm sm:text-lg lg:text-xl text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed drop-shadow-md">
             Premium sleeper buses connecting major cities across Central India.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 pt-1 sm:pt-2 w-full max-w-xs sm:max-w-none mx-auto">
             <a
               href="#booking-section"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm sm:text-base transition-all duration-200 shadow-xl hover:shadow-red-600/30 hover:-translate-y-0.5 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm sm:text-base transition-all duration-200 shadow-xl hover:shadow-red-600/30 hover:-translate-y-0.5 cursor-pointer"
             >
               <span>Book Tickets Now</span>
               <ArrowRight className="w-4 h-4" />
             </a>
             <a
               href="#fleet"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base backdrop-blur-md border border-white/30 transition-all duration-200 shadow-lg hover:-translate-y-0.5 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base backdrop-blur-md border border-white/30 transition-all duration-200 shadow-lg hover:-translate-y-0.5 cursor-pointer"
             >
               <span>Explore Our Fleet</span>
             </a>
@@ -128,7 +128,7 @@ export default function HomePage() {
         {/* The Booking Box: Directly integrated in Hero overlay with high z-index */}
         <div
           id="booking-section"
-          className="relative z-30 max-w-6xl xl:max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 mb-6 sm:mb-8 scroll-mt-28 animate-fade-in"
+          className="relative z-30 max-w-6xl xl:max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 mt-6 sm:mt-10 mb-4 sm:mb-8 scroll-mt-28 animate-fade-in"
         >
           <BusBookingWidget onSearch={handleBusSearch} />
         </div>
