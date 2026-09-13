@@ -366,13 +366,13 @@ export default function SupportChatBox() {
         <div
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
-          className="fixed inset-0 bg-black/45 backdrop-blur-[2px] z-30 sm:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-40 sm:hidden transition-opacity duration-300"
         />
       )}
 
-      <aside aria-label="Hans Travels Support Chat" className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-40 font-sans pointer-events-auto">
-        {/* Floating Bottom-Right Launcher: Larger on mobile for easy thumb tapping */}
-        {!isOpen && (
+      {/* Floating Bottom-Right Launcher (When closed) */}
+      {!isOpen && (
+        <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-40 font-sans pointer-events-auto">
           <button
             type="button"
             id="Contact Support"
@@ -389,17 +389,22 @@ export default function SupportChatBox() {
               </span>
             )}
           </button>
-        )}
+        </div>
+      )}
 
-        {/* Floating Chat Box Window */}
-        {isOpen && (
+      {/* Chat Box Window: Center of the screen on mobile, bottom-right on desktop */}
+      {isOpen && (
+        <aside
+          aria-label="Hans Travels Support Chat"
+          className="fixed inset-0 sm:inset-auto sm:bottom-5 sm:right-5 z-50 flex items-center justify-center sm:block p-3.5 sm:p-0 pointer-events-none font-sans"
+        >
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Bus Support Chat Window"
-            className="w-[calc(100vw-2rem)] sm:w-[380px] h-[540px] max-h-[82vh] sm:max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fade-in transform-gpu [transform:translateZ(0)]"
+            className="w-full max-w-[390px] sm:w-[380px] h-[550px] max-h-[88vh] sm:max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fade-in transform-gpu pointer-events-auto"
             style={{
-              boxShadow: '0 20px 50px -12px rgba(0, 102, 255, 0.2), 0 8px 24px -4px rgba(0, 0, 0, 0.12)',
+              boxShadow: '0 20px 50px -12px rgba(0, 102, 255, 0.25), 0 8px 24px -4px rgba(0, 0, 0, 0.15)',
             }}
           >
           {/* Header */}
@@ -653,9 +658,9 @@ export default function SupportChatBox() {
               Powered by Gemini AI • Hans Travels Bus Support
             </p>
           </footer>
-        </div>
+          </div>
+        </aside>
       )}
-      </aside>
     </>
   );
 }
