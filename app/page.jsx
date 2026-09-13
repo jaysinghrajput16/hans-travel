@@ -80,11 +80,10 @@ export default function HomePage() {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             className="w-full h-full object-cover scale-105 opacity-70 filter saturate-[0.95] brightness-95 contrast-[0.98] transition-opacity duration-700 transform-gpu [transform:translateZ(0)]"
           >
             <source src="/assets/hero-video.mp4" type="video/mp4" />
-            <source src="/mark/videomp4" type="video/mp4" />
             <source src="/mark/videomp4.mp4" type="video/mp4" />
           </video>
           {/* Calibrated 30% Dark Overlay + Top/Bottom Vignette for Clean White Typography */}
